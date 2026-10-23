@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QR Code Mathematics Model</title>
+<meta name="description" content="A 25×25 QR code built by hand from thermocol and black chart paper.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f7f8f4;--ink:#101418;--grid:#dfe5ee;--blue:#2f5bff;--star:#f5a623;--card:#fff;--mute:#566070;--line:#101418;
+--head:'Bricolage Grotesque',system-ui,sans-serif;--body:'IBM Plex Sans',system-ui,sans-serif}
+@media(prefers-color-scheme:dark){:root{--paper:#0f1319;--ink:#eef1f6;--grid:#1d2531;--card:#171d27;--mute:#9aa6b8;--line:#eef1f6;--blue:#7b98ff}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font:400 1.05rem/1.6 var(--body);color:var(--ink);background:var(--paper);
+background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;
+padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--head);line-height:1.08;margin:0}
+h1{font-size:clamp(2.4rem,10vw,4.2rem);font-weight:800;letter-spacing:-.03em}
+h2{font-size:clamp(1.6rem,6vw,2.2rem);font-weight:800;letter-spacing:-.02em;margin-bottom:14px}
+h3{font-size:1.15rem;font-weight:500;margin-bottom:4px}
+section{padding:44px 0}
+p{margin:0 0 14px;max-width:62ch}
+.hero{padding:36px 0 28px}
+.hero p.lead{font-size:1.15rem;color:var(--mute);margin-top:16px}
+.qrbox{width:min(78vw,340px);margin:30px 0 8px;padding:9.5%;background:#fff;border:2px solid var(--line);box-shadow:8px 8px 0 var(--blue);position:relative}
+#qr{display:grid;grid-template-columns:repeat(25,1fr);width:100%;aspect-ratio:1}
+#qr i{background:#fff;transition:background .25s}
+#qr i.on{background:#101418}
+.scan{position:absolute;left:4%;right:4%;height:3px;background:var(--blue);box-shadow:0 0 12px var(--blue);top:8%;animation:scan 3.2s ease-in-out infinite}
+@keyframes scan{0%,100%{top:8%}50%{top:90%}}
+.cap{font-size:.85rem;color:var(--mute)}
+.card{background:var(--card);border:2px solid var(--line);padding:20px;margin-bottom:16px}
+.steps{display:grid;gap:14px;margin-top:18px}
+.steps .card{margin:0}
+.eq{font-family:var(--head);font-weight:500;background:var(--ink);color:var(--paper);display:inline-block;padding:6px 12px;margin:6px 0 14px}
+.specs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.spec{background:var(--card);border:2px solid var(--line);padding:14px}
+.spec b{display:block;font:800 1.7rem/1.1 var(--head)}
+.spec span{font-size:.88rem;color:var(--mute)}
+.gallery{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+.gallery figure{margin:0;aspect-ratio:4/3;border:2px dashed var(--mute);background:var(--card);display:grid;place-items:center;overflow:hidden;position:relative;font-size:.85rem;color:var(--mute);text-align:center}
+.gallery figure:first-child{grid-column:1/-1}
+.gallery img,.gallery video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.avg{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.avg b{font:800 3.2rem/1 var(--head)}
+.stars{display:inline-flex;gap:2px}
+.stars button{background:none;border:0;padding:4px;font-size:2.4rem;line-height:1;cursor:pointer;color:var(--grid);transition:transform .12s,color .12s;-webkit-tap-highlight-color:transparent}
+.stars button.lit{color:var(--star)}
+.stars button:hover{transform:scale(1.18)}
+.stars button:focus-visible,.btn:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.stars.ro button{pointer-events:none;font-size:1.3rem;padding:0}
+label{display:block;font-weight:500;margin:14px 0 6px}
+input,textarea{width:100%;font:inherit;padding:12px;border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:0}
+.btn{font:500 1.05rem var(--body);background:var(--blue);color:#fff;border:2px solid var(--line);padding:13px 22px;margin-top:16px;cursor:pointer;box-shadow:4px 4px 0 var(--line);min-height:48px}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--line)}
+.btn:disabled{opacity:.6}
+.msg{margin-top:14px;font-weight:500}.msg.err{color:#d6322f}.msg.ok{color:#18803c}
+footer{padding:30px 0 50px;font-size:.88rem;color:var(--mute)}
+@media(prefers-reduced-motion:reduce){.scan{animation:none}*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>QR Code Mathematics Model</h1>
+  <p class="lead">You just scanned a QR code that was built by hand. Every square was cut from black chart paper and fixed on a thermocol base — no printer involved.</p>
+  <div class="qrbox"><div id="qr" aria-label="Animated 25 by 25 QR code pattern" role="img"></div><div class="scan"></div></div>
+  <div class="cap">Animated 25 × 25 grid. The real model has 625 squares.</div>
+</header>
+
+<section id="how">
+  <h2>How a QR code works</h2>
+  <p>A QR code is a square grid of tiny squares called <b>modules</b>. Each module is either black (1) or white (0), so the whole code is just a long string of binary digits.</p>
+  <div class="steps">
+    <div class="card"><h3>Storing a link</h3>Each letter of a web address has a number code. Those numbers become bits, and the bits fill the grid in a zigzag path from the bottom-right corner.</div>
+    <div class="card"><h3>Scanning</h3>A phone camera finds the three big corner squares, which tell it the code’s size and which way is up. Then it reads each module as black or white and turns the bits back into text.</div>
+    <div class="card"><h3>Error correction</h3>Extra bits, made with a branch of algebra called Reed–Solomon codes, are added. They let the phone rebuild the data even if part of the code is dirty or damaged — from about 7% up to 30% depending on the level.</div>
+  </div>
+  <div class="eq">25 × 25 = 625 modules</div>
+  <p>A 25 × 25 code is called Version 2. It can hold roughly 14 to 32 characters, depending on the error-correction level. That is why the web address on this model is so short.</p>
+</section>
+
+<section id="model">
+  <h2>Model specifications</h2>
+  <div class="specs">
+    <div class="spec"><b>45 × 45 cm</b><span>Thermocol base</span></div>
+    <div class="spec"><b>25 × 25</b><span>Grid of modules</span></div>
+    <div class="spec"><b>1.5 cm</b><span>Side of each square</span></div>
+    <div class="spec"><b>3.75 cm</b><span>White margin on every side</span></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>Check the maths</h3>
+    Code width: 25 × 1.5 = 37.5 cm<br>
+    Margins: 2 × 3.75 = 7.5 cm<br>
+    Total: 37.5 + 7.5 = <b>45 cm</b> ✓<br>
+    Materials: thermocol sheet, black chart paper, white chart paper.
+  </div>
+</section>
+
+<section id="photos">
+  <h2>Project photos</h2>
+  <div class="gallery">
+    <figure>Add photos/photo1.jpg<img src="photos/photo1.jpg" alt="The finished QR code model" loading="lazy" onerror="this.remove()"></figure>
+    <figure>Add photos/photo2.jpg<img src="photos/photo2.jpg" alt="Cutting the black squares" loading="lazy" onerror="this.remove()"></figure>
+    <figure>Add photos/photo3.jpg<img src="photos/photo3.jpg" alt="Scanning the model with a phone" loading="lazy" onerror="this.remove()"></figure>
+  </div>
+</section>
+
+<section id="rate">
+  <h2>Rate this project</h2>
+  <div class="avg"><b id="avg">–</b><div><div class="stars ro" id="avgStars"></div><div class="cap" id="count">Loading…</div></div></div>
+  <div class="card">
+    <h3>Your rating</h3>
+    <div class="stars" id="pick" role="radiogroup" aria-label="Star rating"></div>
+    <div class="cap" id="hint">Tap a star</div>
+    <label for="name">Name (optional)</label>
+    <input id="name" maxlength="60" autocomplete="name">
+    <label for="comment">Feedback (optional)</label>
+    <textarea id="comment" rows="4" maxlength="1000"></textarea>
+    <button class="btn" id="send">Send feedback</button>
+    <div class="msg" id="msg" role="status"></div>
+  </div>
+</section>
+
+<footer>Maths project · <a href="/admin.html" style="color:inherit">Teacher dashboard</a></footer>
+</div>
+
+<script>
+// --- decorative QR (25x25): finder patterns + pseudo-random data, revealed with a sweep ---
+(function(){
+  const N=25,el=document.getElementById('qr'),g=[];
+  let s=7;const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
+  const finder=(r,c)=>{for(const [R,C] of [[0,0],[0,N-7],[N-7,0]]){const y=r-R,x=c-C;if(y>=0&&y<7&&x>=0&&x<7){
+    return y==0||y==6||x==0||x==6||(y>=2&&y<=4&&x>=2&&x<=4)?1:0}if(y>=-1&&y<8&&x>=-1&&x<8)return 0}return null};
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){const f=finder(r,c);g.push(f===null?(rnd()>.52?1:0):f)}
+  g.forEach(()=>el.appendChild(document.createElement('i')));
+  const cells=el.children,rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  g.forEach((v,i)=>{if(v)setTimeout(()=>cells[i].classList.add('on'),rm?0:(Math.floor(i/N)*45+(i%N)*6))});
+})();
+
+// --- stars ---
+const mk=(box)=>{for(let i=1;i<=5;i++){const b=document.createElement('button');b.type='button';b.textContent='★';b.dataset.v=i;b.setAttribute('aria-label',i+' star'+(i>1?'s':''));box.appendChild(b)}};
+const paint=(box,n)=>[...box.children].forEach((b,i)=>b.classList.toggle('lit',i<n));
+const pick=document.getElementById('pick'),hint=document.getElementById('hint'),words=['','Poor','Fair','Good','Very good','Excellent'];
+let chosen=0;mk(pick);mk(document.getElementById('avgStars'));
+pick.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;chosen=+b.dataset.v;paint(pick,chosen);hint.textContent=chosen+' / 5 · '+words[chosen]});
+pick.addEventListener('mouseover',e=>{const b=e.target.closest('button');if(b)paint(pick,+b.dataset.v)});
+pick.addEventListener('mouseleave',()=>paint(pick,chosen));
+
+function show(d){
+  document.getElementById('avg').textContent=d.count?d.average.toFixed(1):'–';
+  paint(document.getElementById('avgStars'),Math.round(d.average));
+  document.getElementById('count').textContent=d.count?d.count+(d.count==1?' rating':' ratings'):'No ratings yet';
+}
+fetch('/api/stats').then(r=>r.json()).then(show).catch(()=>{document.getElementById('count').textContent='Ratings unavailable'});
+
+const msg=document.getElementById('msg'),send=document.getElementById('send');
+send.onclick=async()=>{
+  msg.className='msg';
+  if(!chosen){msg.textContent='Choose a star rating first.';msg.classList.add('err');return}
+  send.disabled=true;
+  try{
+    const r=await fetch('/api/ratings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({stars:chosen,name:document.getElementById('name').value,comment:document.getElementById('comment').value})});
+    const d=await r.json();if(!r.ok)throw new Error(d.error||'Could not send');
+    show(d);msg.textContent='Thank you! Your feedback was saved.';msg.classList.add('ok');
+    chosen=0;paint(pick,0);hint.textContent='Tap a star';document.getElementById('name').value='';document.getElementById('comment').value='';
+  }catch(e){msg.textContent=e.message;msg.classList.add('err')}
+  send.disabled=false;
+};
+</script>
+</body>
+</html>
